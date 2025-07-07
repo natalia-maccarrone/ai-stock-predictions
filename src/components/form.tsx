@@ -127,20 +127,20 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
               </Button>
             </div>
           </form>
-          <div className="bg-muted relative hidden md:block">
-            <div className="w-full h-full flex justify-center items-center overflow-y-auto">
-              {!!stockAnalysis.length ? (
-                <div className="p-6">
-                  <p className="text-sm text-muted-foreground">
-                    {stockAnalysis}
-                  </p>
-                </div>
-              ) : (
+          <div className="bg-muted relative hidden md:block overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-black">
+            {!!stockAnalysis.length ? (
+              <div className="w-full h-full">
+                <p className="text-sm text-muted-foreground p-6">
+                  {stockAnalysis}
+                </p>
+              </div>
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
                 <p className="text-sm text-muted-foreground">
                   Your report will appear here.
                 </p>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex items-center gap-2 text-xs">
