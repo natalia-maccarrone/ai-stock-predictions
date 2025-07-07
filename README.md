@@ -2,7 +2,7 @@
 
 A modern web application that uses AI to analyze stock market data and provide investment recommendations. Built with Next.js 15, OpenAI API, and Polygon.io for real-time stock data.
 
-<img src="./public/screenshot.png" alt="AI Stock Predictions App" width="50%">
+<img src="./public/screenshot.png" alt="AI Stock Predictions App" width="70%">
 
 ## 🚀 Features
 
