@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const aiResponse = await client.responses.create({
       model: process.env.OPENAI_MODEL,
       instructions:
-        "You are a trading guru. Given data on share prices over the past 10 days, write a report of no more than 150 words describing the stocks performance and recommending whether to buy, hold or sell.",
+        "You are a trading guru. Given data on share prices over the past 10 days, write a report of no more than 150 words describing the stocks performance and recommending whether to buy, hold or sell. If no data is available for a specific ticker respond with: No data available for ticker.",
       input: JSON.stringify(stockData),
     });
 
