@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { LoaderCircleIcon } from "lucide-react";
 
 const MAX_TICKERS = 3;
 
@@ -54,6 +55,7 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
       setStockAnalysis(analysisData.analysis);
     } catch (error) {
       console.error("Error fetching stock data:", error);
+      setStockAnalysis("An error occured, please try again.");
     } finally {
       setLoadingStockData(false);
     }
@@ -123,7 +125,14 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
                 disabled={tickers.length === 0 || isLoadingStockData}
                 onClick={() => fetchStockData(tickers)}
               >
-                {`${isLoadingStockData ? "Generating" : "Generate"} report`}
+                {isLoadingStockData ? (
+                  <div className="flex items-center gap-2">
+                    <LoaderCircleIcon className="animate-spin" />
+                    <p>Generating report</p>
+                  </div>
+                ) : (
+                  <p>Generate report</p>
+                )}
               </Button>
             </div>
           </form>
@@ -136,9 +145,13 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
               </div>
             ) : (
               <div className="w-full h-full flex justify-center items-center">
-                <p className="text-sm text-muted-foreground">
-                  Your report will appear here.
-                </p>
+                <div className="text-sm text-muted-foreground">
+                  {isLoadingStockData ? (
+                    <LoaderCircleIcon className="animate-spin" />
+                  ) : (
+                    <p>Your report will appear here.</p>
+                  )}
+                </div>
               </div>
             )}
           </div>
