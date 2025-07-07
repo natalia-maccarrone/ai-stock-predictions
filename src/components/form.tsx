@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { useState } from "react";
 
 const MAX_TICKERS = 3;
@@ -13,7 +12,7 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
   const [inputValue, setInputValue] = useState<string>("");
   const [tickers, setTickers] = useState<string[]>([]);
   const [isLoadingStockData, setLoadingStockData] = useState(false);
-  const [stockData, setStockData] = useState(null);
+  const [stockAnalysis, setStockAnalysis] = useState("");
 
   const isValidTicker =
     inputValue !== "" && !tickers.includes(inputValue.toUpperCase());
@@ -22,6 +21,7 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
 
   const handleAddTicker = (ticker: string) => {
     if (isValidTicker) {
+      setStockAnalysis("");
       setTickers((prev) =>
         prev ? [...prev, ticker.toUpperCase()] : [ticker.toUpperCase()]
       );
@@ -35,18 +35,29 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
   const fetchStockData = async (tickers: string[]) => {
     setLoadingStockData(true);
     try {
-      const response = await fetch(`/polygon?tickers=${tickers.join(",")}`);
+      const polygonResponse = await fetch(
+        `/polygon?tickers=${tickers.join(",")}`
+      );
 
-      const data = await response.json();
-      setStockData(data);
+      const stockData = await polygonResponse.json();
+
+      const openAiResponse = await fetch("/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(stockData),
+      });
+
+      const analysisData = await openAiResponse.json();
+
+      setStockAnalysis(analysisData.analysis);
     } catch (error) {
       console.error("Error fetching stock data:", error);
     } finally {
       setLoadingStockData(false);
     }
   };
-
-  console.log(stockData);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -64,16 +75,16 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">AI Stock Predictions</h1>
-                <p className="text-muted-foreground text-balance">
-                  Add up to three stock tickers below to get a stock preditions
-                  report
+                <p className="text-muted-foreground text-balance text-xs">
+                  Add up to three stock tickers to get a stock preditions report
+                  (e.g. AMZN, TSLA, AAPL, NVDA, etc)
                 </p>
               </div>
               <div className="flex gap-2">
                 <Input
                   id="ticker"
                   type="ticker"
-                  placeholder="MSFT"
+                  placeholder="Insert ticker here"
                   required
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
@@ -117,12 +128,22 @@ export function Form({ className, ...props }: React.ComponentProps<"div">) {
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <div className="w-full h-full flex justify-center items-center">
-              <Image width={200} height={200} src="/file.svg" alt="Image" />
+            <div className="w-full h-full flex justify-center items-center overflow-y-auto">
+              {!!stockAnalysis.length ? (
+                <div className="p-6">
+                  <p className="text-sm text-muted-foreground">
+                    {stockAnalysis}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Your report will appear here.
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex items-center gap-2">
+        <CardFooter className="flex items-center gap-2 text-xs">
           <span>⚠️</span>
           <p className="text-muted-foreground">
             This is just a demo app. Not real financial advice.

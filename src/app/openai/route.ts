@@ -1,28 +1,32 @@
 import OpenAI from "openai";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    console.log(searchParams);
+    const stockData = await request.json();
+
     const client = new OpenAI();
 
-    const response = await client.responses.create({
-      model: process.env.OPEN_AI_MODEL,
-      input: "Input example",
+    const aiResponse = await client.responses.create({
+      model: process.env.OPENAI_MODEL,
+      instructions:
+        "You are a trading guru. Given data on share prices over the past 10 days, write a report of no more than 150 words describing the stocks performance and recommending whether to buy, hold or sell.",
+      input: JSON.stringify(stockData),
     });
 
-    console.log(response.output_text);
-
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return new Response(
+      JSON.stringify({
+        analysis: aiResponse.output_text,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unexpected exception";
-
     return new Response(message, { status: 500 });
   }
 }

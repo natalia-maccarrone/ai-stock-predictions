@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const tickers = tickersParam.split(",");
 
     const startDate = DateTime.fromJSDate(new Date())
-      .minus({ days: 3 })
+      .minus({ days: 10 })
       .toFormat("yyyy-MM-dd");
     const endDate = DateTime.fromJSDate(new Date())
       .minus({ days: 1 })
